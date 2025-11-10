@@ -5,7 +5,7 @@
 
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
 import type { Signer, ContractTransactionReceipt } from "ethers";
-import type { FHEJanken } from "../../types";
+import type { FHERockPaperScissors } from "../types";
 import { FhevmType } from "@fhevm/hardhat-plugin";
 
 /**

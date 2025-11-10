@@ -1,31 +1,31 @@
 /**
- * FHEJanken Hardhat Tasks
- * CLI tasks for interacting with FHEJanken contract
+ * FHERockPaperScissors Hardhat Tasks
+ * CLI tasks for interacting with FHERockPaperScissors contract
  */
 
 import { task } from "hardhat/config";
 import type { TaskArguments } from "hardhat/types";
-import { parseMoveString, parseModeString, parsePlayerName, getPlayerName, GameMode } from "./helpers/janken-helpers";
+import { parseMoveString, parseModeString, parsePlayerName, getPlayerName, GameMode } from "./utils";
 
 /**
- * Tutorial: Two-Player Game
+ * Game Tutorial
  * ========================================
  *
- *   npx hardhat --network localhost janken:create-game --mode two-player --player alice
- *   npx hardhat --network localhost janken:join-game --game-id 1 --player bob
+ *   npx hardhat --network localhost rps:create-game --mode two-player --player alice
+ *   npx hardhat --network localhost rps:join-game --game-id 1 --player bob
 
- *   npx hardhat --network localhost janken:submit-move --game-id 1 --move rock --player alice
- *   npx hardhat --network localhost janken:submit-move --game-id 1 --move scissors --player bob
+ *   npx hardhat --network localhost rps:submit-move --game-id 1 --move rock --player alice
+ *   npx hardhat --network localhost rps:submit-move --game-id 1 --move scissors --player bob
  *   
- *    npx hardhat --network localhost janken:check-winner --game-id 1
- *    npx hardhat --network localhost janken:game-info --game-id 1
+ *    npx hardhat --network localhost rps:check-winner --game-id 1
+ *    npx hardhat --network localhost rps:game-info --game-id 1
  *
  */
 
 /**
  * Create a new game
  */
-task("janken:create-game", "Create a new game")
+task("rps:create-game", "Create a new game")
   .addOptionalParam("address", "Contract address")
   .addParam("mode", "Game mode: 'single-player' or 'two-player'")
   .addOptionalParam("player", "Player name (alice, bob) or index (default: alice)", "alice")
@@ -35,12 +35,12 @@ task("janken:create-game", "Create a new game")
 
     const deployment = taskArguments.address
       ? { address: taskArguments.address }
-      : await deployments.get("FHEJanken");
+      : await deployments.get("FHERockPaperScissors");
 
     const signers = await ethers.getSigners();
     const signerIndex = parsePlayerName(taskArguments.player);
     const signer = signers[signerIndex];
-    const contract = await ethers.getContractAt("FHEJanken", deployment.address);
+    const contract = await ethers.getContractAt("FHERockPaperScissors", deployment.address);
     const mode = parseModeString(taskArguments.mode);
 
   
@@ -75,7 +75,7 @@ task("janken:create-game", "Create a new game")
 /**
  * Join an existing game
  */
-task("janken:join-game", "Join a two-player game")
+task("rps:join-game", "Join a two-player game")
   .addOptionalParam("address", "Contract address")
   .addParam("gameId", "Game ID to join")
   .addOptionalParam("player", "Player name (alice, bob) or index (default: bob)", "bob")
@@ -84,12 +84,12 @@ task("janken:join-game", "Join a two-player game")
 
     const deployment = taskArguments.address
       ? { address: taskArguments.address }
-      : await deployments.get("FHEJanken");
+      : await deployments.get("FHERockPaperScissors");
 
     const signers = await ethers.getSigners();
     const signerIndex = parsePlayerName(taskArguments.player);
     const signer = signers[signerIndex];
-    const contract = await ethers.getContractAt("FHEJanken", deployment.address);
+    const contract = await ethers.getContractAt("FHERockPaperScissors", deployment.address);
     const gameId = BigInt(taskArguments.gameId);
 
     console.log(`Player2: ${getPlayerName(signerIndex)} (${await signer.getAddress()})`);
@@ -104,7 +104,7 @@ task("janken:join-game", "Join a two-player game")
 /**
  * Submit encrypted move
  */
-task("janken:submit-move", "Submit an encrypted move")
+task("rps:submit-move", "Submit an encrypted move")
   .addOptionalParam("address", "Contract address")
   .addParam("gameId", "Game ID")
   .addParam("move", "Move: 'rock', 'paper', or 'scissors'")
@@ -115,12 +115,12 @@ task("janken:submit-move", "Submit an encrypted move")
 
     const deployment = taskArguments.address
       ? { address: taskArguments.address }
-      : await deployments.get("FHEJanken");
+      : await deployments.get("FHERockPaperScissors");
 
     const signers = await ethers.getSigners();
     const signerIndex = parsePlayerName(taskArguments.player);
     const signer = signers[signerIndex];
-    const contract = await ethers.getContractAt("FHEJanken", deployment.address);
+    const contract = await ethers.getContractAt("FHERockPaperScissors", deployment.address);
     const gameId = BigInt(taskArguments.gameId);
     const move = parseMoveString(taskArguments.move);
 
@@ -144,7 +144,7 @@ task("janken:submit-move", "Submit an encrypted move")
 /**
  * Check winner
  */
-task("janken:check-winner", "Check game winner")
+task("rps:check-winner", "Check game winner")
   .addOptionalParam("address", "Contract address")
   .addParam("gameId", "Game ID")
   .setAction(async function (taskArguments: TaskArguments, hre) {
@@ -153,10 +153,10 @@ task("janken:check-winner", "Check game winner")
 
     const deployment = taskArguments.address
       ? { address: taskArguments.address }
-      : await deployments.get("FHEJanken");
+      : await deployments.get("FHERockPaperScissors");
 
     const signers = await ethers.getSigners();
-    const contract = await ethers.getContractAt("FHEJanken", deployment.address);
+    const contract = await ethers.getContractAt("FHERockPaperScissors", deployment.address);
     const gameId = BigInt(taskArguments.gameId);
 
     console.log(`Checking winner for game ${gameId}...`);
@@ -184,7 +184,7 @@ task("janken:check-winner", "Check game winner")
 /**
  * Get game info
  */
-task("janken:game-info", "Get game information")
+task("rps:game-info", "Get game information")
   .addOptionalParam("address", "Contract address")
   .addParam("gameId", "Game ID")
   .setAction(async function (taskArguments: TaskArguments, hre) {
@@ -194,9 +194,9 @@ task("janken:game-info", "Get game information")
 
     const deployment = taskArguments.address
       ? { address: taskArguments.address }
-      : await deployments.get("FHEJanken");
+      : await deployments.get("FHERockPaperScissors");
 
-    const contract = await ethers.getContractAt("FHEJanken", deployment.address);
+    const contract = await ethers.getContractAt("FHERockPaperScissors", deployment.address);
     const gameId = BigInt(taskArguments.gameId);
     const game = await contract.games(gameId);
 

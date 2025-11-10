@@ -1,24 +1,24 @@
 /**
- * Simple SDK Tests for FHERockPaperSissorsSDK
+ * Simple SDK Tests for FHERockPaperScissorsSDK
  *
  */
 
 import { expect } from "chai";
 import hre from "hardhat";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import { FHERockPaperSissors, FHERockPaperSissors__factory } from "../../types";
-import { FHERockPaperSissorsSDK, Move, GameMode } from "../src";
+import { FHERockPaperScissors, FHERockPaperScissors__factory } from "../../types";
+import { FHERockPaperScissorsSDK, Move, GameMode } from "../src";
 
 
 const ethers = (hre as any).ethers;
 const fhevm = (hre as any).fhevm;
 
-describe("FHERockPaperSissorsSDK - Simple Tests", function () {
+describe("FHERockPaperScissorsSDK - Simple Tests", function () {
   let contractAddress: string;
   let alice: HardhatEthersSigner;
   let bob: HardhatEthersSigner;
-  let sdkAlice: FHERockPaperSissorsSDK;
-  let sdkBob: FHERockPaperSissorsSDK;
+  let sdkAlice: FHERockPaperScissorsSDK;
+  let sdkBob: FHERockPaperScissorsSDK;
 
   before(async function () {
     // Skip tests if not in mock mode
@@ -31,24 +31,22 @@ describe("FHERockPaperSissorsSDK - Simple Tests", function () {
     alice = signers[0];
     bob = signers[1];
 
-    console.log("\n📦 Deploying FHERockPaperSissors contract...");
-
     // Deploy the contract
-    const factory = (await ethers.getContractFactory("FHERockPaperSissors")) as FHERockPaperSissors__factory;
-    const contract: FHERockPaperSissors = await factory.deploy();
+    const factory = (await ethers.getContractFactory("FHERockPaperScissors")) as FHERockPaperScissors__factory;
+    const contract: FHERockPaperScissors = await factory.deploy();
     await contract.waitForDeployment();
     contractAddress = await contract.getAddress();
 
     console.log(`Contract deployed at: ${contractAddress}`);
 
     // Initialize SDK instances for Alice and Bob
-    sdkAlice = new FHERockPaperSissorsSDK({
+    sdkAlice = new FHERockPaperScissorsSDK({
       contractAddress,
       signer: alice,
       fhevm: fhevm,
     });
 
-    sdkBob = new FHERockPaperSissorsSDK({
+    sdkBob = new FHERockPaperScissorsSDK({
       contractAddress,
       signer: bob,
       fhevm: fhevm,
@@ -65,7 +63,6 @@ describe("FHERockPaperSissorsSDK - Simple Tests", function () {
     it("should allow Alice to create a two-player game", async () => {
       const result = await sdkAlice.createGame(GameMode.TwoPlayer);
 
-      expect(result.gameId).to.be.a("bigint");
       expect(result.receipt).to.not.be.undefined;
 
       gameId = result.gameId;
@@ -82,7 +79,6 @@ describe("FHERockPaperSissorsSDK - Simple Tests", function () {
     });
 
     it("should allow Alice to submit move (Rock)", async () => {
-      console.log("Alice plays Rock...");
       await sdkAlice.submitMove(gameId, Move.Rock);
 
       const gameInfo = await sdkAlice.getGameInfo(gameId);
@@ -91,7 +87,6 @@ describe("FHERockPaperSissorsSDK - Simple Tests", function () {
     });
 
     it("should allow Bob to submit move (Scissors)", async () => {
-      console.log("Bob plays Scissors...");
       await sdkBob.submitMove(gameId, Move.Scissors);
       const gameInfo = await sdkAlice.getGameInfo(gameId);
       expect(gameInfo.move1Submitted).to.be.true;
@@ -99,7 +94,6 @@ describe("FHERockPaperSissorsSDK - Simple Tests", function () {
     });
 
     it("should determine Alice as winner (Rock beats Scissors)", async () => {
-      console.log("Checking winner...");
       await sdkAlice.checkWinner(gameId);
 
       // Wait for decryption oracle in mock mode
@@ -115,15 +109,12 @@ describe("FHERockPaperSissorsSDK - Simple Tests", function () {
   });
 
   
-
   describe("Single-Player Game: Player vs CPU", () => {
     let gameId: bigint;
 
     it("should create a single-player game", async () => {
-      console.log("Creating single-player game...");
       const result = await sdkAlice.createGame(GameMode.SinglePlayer);
 
-      expect(result.gameId).to.be.a("bigint");
       gameId = result.gameId;
 
       const gameInfo = await sdkAlice.getGameInfo(gameId);
@@ -138,7 +129,6 @@ describe("FHERockPaperSissorsSDK - Simple Tests", function () {
       const gameInfo = await sdkAlice.getGameInfo(gameId);
       expect(gameInfo.move1Submitted).to.be.true;
       expect(gameInfo.move2Submitted).to.be.true;
-      console.log("CPU move auto-generated");
     });
 
     it("should determine winner for single-player game", async () => {

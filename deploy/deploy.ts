@@ -5,13 +5,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  const deployedFHEJanken = await deploy("FHEJanken", {
+  const deployedFHEJanken = await deploy("FHERockPaperSissors", {
     from: deployer,
     log: true,
   });
 
-  console.log(`FHEJanken contract: `, deployedFHEJanken.address);
+  console.log(`FHERockPaperSissors contract: `, deployedFHEJanken.address);
 };
 export default func;
-func.id = "deploy_fheJanken"; // id required to prevent reexecution
-func.tags = ["FHEJanken"];
+func.id = "deploy_fheRockPaperSissors"; // id required to prevent reexecution
+func.tags = ["FHERockPaperSissors"];

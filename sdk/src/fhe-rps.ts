@@ -1,14 +1,14 @@
 /**
- * FHERockPaperSissors SDK - TypeScript SDK for FHERockPaperSissors Contract
- * @module FHERockPaperSissorsSDK
+ * FHERockPaperScissors SDK - TypeScript SDK for FHERockPaperScissors Contract
+ * @module FHERockPaperScissorsSDK
  */
 
 import type { FhevmInstance } from "@zama-fhe/relayer-sdk/node";
 import { ethers, type ContractTransactionReceipt } from "ethers";
-import type { FHERockPaperSissors } from "../../types";
-import { FHERockPaperSissors__factory } from "../../types/factories/contracts/FHERockPaperSissors__factory";
+import type { FHERockPaperScissors } from "../../types";
+import { FHERockPaperScissors__factory } from "../../types/factories/contracts/FHERockPaperScissors__factory";
 import type {
-  FHERockPaperSissorsSDKConfig,
+  FHERockPaperScissorsSDKConfig,
   CreateGameResult,
   SubmitMoveResult,
   GameResult,
@@ -19,27 +19,27 @@ import type {
 import { GameMode as GameModeEnum } from "./types";
 
 /**
- * Main SDK class for interacting with the FHERockPaperSissors contract
+ * Main SDK class for interacting with the FHERockPaperScissors contract
  */
-export class FHERockPaperSissorsSDK {
-  private contract: FHERockPaperSissors;
+export class FHERockPaperScissorsSDK {
+  private contract: FHERockPaperScissors;
   private signer: ethers.Signer;
   private fhevm: FhevmInstance;
   private contractAddress: string;
 
   /**
-   * Create a new FHERockPaperSissorsSDK instance
+   * Create a new FHERockPaperScissorsSDK instance
    *
    * @param config - SDK configuration options
    * @throws {Error} If contract address is invalid
    */
-  constructor(config: FHERockPaperSissorsSDKConfig) {
+  constructor(config: FHERockPaperScissorsSDKConfig) {
     this.contractAddress = config.contractAddress;
     this.signer = config.signer;
     this.fhevm = config.fhevm;
 
     // Create contract instance
-    this.contract = FHERockPaperSissors__factory.connect(
+    this.contract = FHERockPaperScissors__factory.connect(
       this.contractAddress,
       this.signer
     );

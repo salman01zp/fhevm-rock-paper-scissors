@@ -1,10 +1,10 @@
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { ethers, fhevm } from "hardhat";
-import { FHERockPaperSissors, FHERockPaperSissors__factory } from "../types";
+import { FHERockPaperScissors, FHERockPaperScissors__factory } from "../types";
 import { expect } from "chai";
 
-describe("FHERockPaperSissors", function () {
-  let contract: FHERockPaperSissors;
+describe("FHERockPaperScissors", function () {
+  let contract: FHERockPaperScissors;
   let alice: HardhatEthersSigner;
   let bob: HardhatEthersSigner;
 
@@ -17,7 +17,7 @@ describe("FHERockPaperSissors", function () {
     alice = signers[0];
     bob = signers[1];
 
-    const factory = (await ethers.getContractFactory("FHERockPaperSissors")) as FHERockPaperSissors__factory;
+    const factory = (await ethers.getContractFactory("FHERockPaperScissors")) as FHERockPaperScissors__factory;
     contract = await factory.deploy();
     await contract.waitForDeployment();
   });

@@ -1,7 +1,7 @@
-export { FHERockPaperSissorsSDK } from "./fhe-rps";
+export { FHERockPaperScissorsSDK } from "./fhe-rps";
 
 export type {
-  FHERockPaperSissorsSDKConfig,
+  FHERockPaperScissorsSDKConfig,
   CreateGameResult,
   SubmitMoveResult,
   GameResult,
@@ -16,8 +16,4 @@ export {
   getMoveString,
   getGameModeString,
   determineWinner,
-  isZeroAddress,
-  isCpuAddress,
-  formatAddress,
-  getRandomMove,
 } from "./utils";
