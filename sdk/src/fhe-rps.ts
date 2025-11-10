@@ -67,8 +67,6 @@ export class FHERockPaperSissorsSDK {
 
     // Extract game ID from GameCreated event
     const gameId = await this.extractGameIdFromReceipt(receipt);
-    console.log("Game created", { gameId: gameId.toString(), txHash: receipt.hash })
-
     return { gameId, receipt };
   }
 
@@ -88,9 +86,6 @@ export class FHERockPaperSissorsSDK {
     if (!receipt) {
       throw new Error("Transaction failed: no receipt");
     }
-
-    console.log("Joined game", { gameId: gameId.toString(), txHash: receipt.hash });
-
     return receipt;
   }
 
@@ -133,11 +128,6 @@ export class FHERockPaperSissorsSDK {
     const gameInfo = await this.getGameInfo(gameId);
     const readyToCheckWinner = gameInfo.move1Submitted && gameInfo.move2Submitted;
 
-    console.log("Encrypted Move submitted", {
-      gameId: gameId.toString(),
-      txHash: receipt.hash,
-    });
-
     return { receipt, readyToCheckWinner };
   }
 
@@ -165,12 +155,6 @@ export class FHERockPaperSissorsSDK {
 
     const result = this.parseGameResult(gameInfo);
 
-    console.log("Winner determined", {
-      gameId: gameId.toString(),
-      isDraw: result.isDraw,
-      winner: result.winner,
-    });
-
     return result;
   }
 
@@ -182,7 +166,6 @@ export class FHERockPaperSissorsSDK {
    *
    */
   async getGameInfo(gameId: bigint): Promise<GameInfo> {
-    console.log(`Getting game info for ${gameId}`);
 
     const game = await this.contract.games(gameId);
 
@@ -196,41 +179,10 @@ export class FHERockPaperSissorsSDK {
       winner: game.winner,
     };
 
-    console.log("Game info retrieved", { gameId: gameId.toString(), gameInfo });
-
     return gameInfo;
   }
 
-  /**
-   * Get the current game ID counter (total games created)
-   *
-   * @returns Promise containing the current game ID counter
-   *
-   * @example
-   * ```typescript
-   * const currentGameId = await sdk.getCurrentGameId();
-   * console.log(`Total games created: ${currentGameId}`);
-   * ```
-   */
-  async getCurrentGameId(): Promise<bigint> {
-    const gameId = await this.contract.gameId();
-    console.log("Current game ID", { gameId: gameId.toString() });
-    return gameId;
-  }
-  /**
-   * Get the contract instance
-   *
-   * @returns The FHERockPaperSissors contract instance
-   *
-   * @example
-   * ```typescript
-   * const contract = sdk.getContract();
-   * // Use contract directly for advanced operations
-   * ```
-   */
-  getContract(): FHERockPaperSissors {
-    return this.contract;
-  }
+
 
   /**
    * Extract game ID from transaction receipt
