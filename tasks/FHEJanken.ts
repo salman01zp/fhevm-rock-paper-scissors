@@ -5,9 +5,7 @@
 
 import { task } from "hardhat/config";
 import type { TaskArguments } from "hardhat/types";
-import { parseMoveString, parseModeString, parsePlayerName, getPlayerName, GameMode } from "./utils/janken-helpers";
-import { fhevm } from "hardhat";
-import { FhevmType } from "@fhevm/hardhat-plugin";
+import { parseMoveString, parseModeString, parsePlayerName, getPlayerName, GameMode } from "./helpers/janken-helpers";
 
 /**
  * Tutorial: Two-Player Game
@@ -221,8 +219,6 @@ task("janken:game-info", "Get game information")
         console.log(`Winner: Player2(${game.winner})`);
       }
     }
-
-    fhevm.userDecrypt
   });
 
 
