@@ -17,8 +17,8 @@ import { parseMoveString, parseModeString, parsePlayerName, getPlayerName, GameM
  *   npx hardhat --network localhost rps:submit-move --game-id 1 --move rock --player alice
  *   npx hardhat --network localhost rps:submit-move --game-id 1 --move scissors --player bob
  *   
- *    npx hardhat --network localhost rps:check-winner --game-id 1
- *    npx hardhat --network localhost rps:game-info --game-id 1
+ *   npx hardhat --network localhost rps:check-winner --game-id 1
+ *   npx hardhat --network localhost rps:game-info --game-id 1
  *
  */
 
