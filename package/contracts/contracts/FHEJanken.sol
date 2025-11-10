@@ -59,9 +59,8 @@ contract FHEJanken is SepoliaConfig {
     event MoveSubmitted(uint256 indexed gameId, address indexed player, euint8 move);
     /// @notice Emitted when game finishes
     /// @param gameId Game ID
-    /// @param result Game result
     /// @param winner Winner address
-    event GameFinished(uint256 indexed gameId, address winner);
+    event GameFinished(uint256 indexed gameId, address indexed winner);
 
     // Errors
     error GameAlreadyFinished();
