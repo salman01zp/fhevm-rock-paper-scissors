@@ -33,12 +33,12 @@ Confidential Rock-Paper-Scissors game on FHEVM
    npx hardhat deploy --network localhost
    ```
 
-4. **Play Rock Paper Scissor Game**
+4. **Play Rock Paper Scissor Game - Two Player**
 
    ```bash
-   # Alice Creates Game
+   # Alice Creates Two Player Game
    npx hardhat --network localhost rps:create-game --mode two-player --player alice
-   # Bob Joins Game
+   # Bob Joins Game 
    npx hardhat --network localhost rps:join-game --game-id 1 --player bob
 
    # Alice and Bob submits encrypted moves
@@ -48,8 +48,20 @@ Confidential Rock-Paper-Scissors game on FHEVM
    #Check Winner of the game
    npx hardhat --network localhost rps:check-winner --game-id 1
    ```
+5. **Play Rock Paper Scissor Game - Single Player vs(CPU)**
+   ```bash
+   # Alice Creates Single Player Game
+   npx hardhat --network localhost rps:create-game --mode single-player --player alice
 
-5. **Test SDK**
+   # Alice submits encrypted moves, CPU move is auto generated
+   # Remember to use correct game Id
+   npx hardhat --network localhost rps:submit-move --game-id 2 --move rock --player alice
+
+   #Check Winner of the game
+   npx hardhat --network localhost rps:check-winner --game-id 2
+   ```
+
+6. **Test SDK**
 
    ```bash
       npx hardhat test sdk/test/FHERockPaperScissorsSDK.test.ts
