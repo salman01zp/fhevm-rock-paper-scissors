@@ -5,7 +5,7 @@ import {FHE, euint8, externalEuint8, ebool} from "@fhevm/solidity/lib/FHE.sol";
 import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 
 /// @title FHE Rock-Paper-Scissors Game
-/// @notice Rock-Paper-Scissors game using FHE for encrypted moves
+/// @notice Rock-Paper-Scissors (JankenPon) game using FHE for encrypted moves
 /// @author salman01zp
 contract FHEJanken is SepoliaConfig {
     /// @notice Game state
@@ -27,13 +27,6 @@ contract FHEJanken is SepoliaConfig {
     enum GameMode {
         SinglePlayer,
         TwoPlayer
-    }
-
-    /// @notice Game result types
-    enum GameResult {
-        Draw,
-        Player1Won,
-        Player2Won
     }
 
     // Constants
@@ -68,7 +61,7 @@ contract FHEJanken is SepoliaConfig {
     /// @param gameId Game ID
     /// @param result Game result
     /// @param winner Winner address
-    event GameFinished(uint256 indexed gameId, GameResult result, address winner);
+    event GameFinished(uint256 indexed gameId, address winner);
 
     // Errors
     error GameAlreadyFinished();
@@ -147,7 +140,7 @@ contract FHEJanken is SepoliaConfig {
         euint8 move = FHE.fromExternal(encryptedMove1, inputProof);
         _recordMove(game, _gameId, move);
 
-        // Auto-generate CPU move for single-player
+        // Auto-generate Computer move for single-player
         if (game.mode == GameMode.SinglePlayer && !game.move2Submitted) {
             _generateMove(_gameId);
         }
@@ -189,7 +182,7 @@ contract FHEJanken is SepoliaConfig {
         emit MoveSubmitted(_gameId, msg.sender, move);
     }
 
-    /// @notice Generate random CPU move
+    /// @notice Generate random Computer move
     /// @param _gameId Game ID
     function _generateMove(uint256 _gameId) private {
         Game storage game = games[_gameId];
@@ -221,7 +214,6 @@ contract FHEJanken is SepoliaConfig {
         game.encryptedPlayer1Won = FHE.or(FHE.or(rockBeatsScissors, paperBeatsRock), scissorsBeatsPaper);
         FHE.allowThis(game.encryptedPlayer1Won);
         FHE.allowThis(game.isGameDraw);
-        FHE.makePubliclyDecryptable(game.encryptedPlayer1Won);
     }
 
     /// @notice Request to decrypt and determine winner
@@ -257,13 +249,13 @@ contract FHEJanken is SepoliaConfig {
         Game storage game = games[_gameId];
 
         if (_clearIsGameDraw) {
-            emit GameFinished(_gameId, GameResult.Draw, address(0)); // No winner
+            emit GameFinished(_gameId, address(0));   // Game draw, no winner
         } else if (_clearPlayer1Won) {
             game.winner = game.player1;
-            emit GameFinished(_gameId, GameResult.Player1Won, game.player1); // Player1 Won
+            emit GameFinished(_gameId, game.player1); // Player1 Won
         } else {
             game.winner = game.player2;
-            emit GameFinished(_gameId, GameResult.Player2Won, game.player2); // Player2 Won
+            emit GameFinished(_gameId, game.player2); // Player2 Won
         }
         game.isGamefinished = true;
         delete decryptionRequestToGame[requestId];
