@@ -6,7 +6,7 @@ Confidential Rock-Paper-Scissors game on FHEVM
 
 ### Prerequisites
 
-- **Node.js**: Version 20 or higher
+- **Node.js**: Version 18 or higher
 - **npm or yarn/pnpm**: Package manager
 
 ### Installation
@@ -38,7 +38,7 @@ Confidential Rock-Paper-Scissors game on FHEVM
    ```bash
    # Alice Creates Two Player Game
    npx hardhat --network localhost rps:create-game --mode two-player --player alice
-   # Bob Joins Game 
+   # Bob Joins Game
    npx hardhat --network localhost rps:join-game --game-id 1 --player bob
 
    # Alice and Bob submits encrypted moves
@@ -48,7 +48,9 @@ Confidential Rock-Paper-Scissors game on FHEVM
    #Check Winner of the game
    npx hardhat --network localhost rps:check-winner --game-id 1
    ```
+
 5. **Play Rock Paper Scissor Game - Single Player vs(CPU)**
+
    ```bash
    # Alice Creates Single Player Game
    npx hardhat --network localhost rps:create-game --mode single-player --player alice
