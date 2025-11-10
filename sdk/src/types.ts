@@ -87,7 +87,7 @@ export interface GameResult {
 /**
  * Configuration options for the SDK
  */
-export interface FHEJankenSDKConfig {
+export interface FHERockPaperSissorsSDKConfig {
   /** Contract address */
   contractAddress: string;
   /** Signer for transactions */

@@ -1,14 +1,14 @@
 /**
- * FHEJanken SDK - TypeScript SDK for FHEJanken Contract
- * @module FHEJankenSDK
+ * FHERockPaperSissors SDK - TypeScript SDK for FHERockPaperSissors Contract
+ * @module FHERockPaperSissorsSDK
  */
 
 import type { FhevmInstance } from "@zama-fhe/relayer-sdk/node";
 import { ethers, type ContractTransactionReceipt } from "ethers";
-import type { FHEJanken } from "../../types";
-import { FHEJanken__factory } from "../../types/factories/contracts/FHEJanken__factory";
+import type { FHERockPaperSissors } from "../../types";
+import { FHERockPaperSissors__factory } from "../../types/factories/contracts/FHERockPaperSissors__factory";
 import type {
-  FHEJankenSDKConfig,
+  FHERockPaperSissorsSDKConfig,
   CreateGameResult,
   SubmitMoveResult,
   GameResult,
@@ -19,27 +19,27 @@ import type {
 import { GameMode as GameModeEnum } from "./types";
 
 /**
- * Main SDK class for interacting with the FHEJanken contract
+ * Main SDK class for interacting with the FHERockPaperSissors contract
  */
-export class FHEJankenSDK {
-  private contract: FHEJanken;
+export class FHERockPaperSissorsSDK {
+  private contract: FHERockPaperSissors;
   private signer: ethers.Signer;
   private fhevm: FhevmInstance;
   private contractAddress: string;
 
   /**
-   * Create a new FHEJankenSDK instance
+   * Create a new FHERockPaperSissorsSDK instance
    *
    * @param config - SDK configuration options
    * @throws {Error} If contract address is invalid
    */
-  constructor(config: FHEJankenSDKConfig) {
+  constructor(config: FHERockPaperSissorsSDKConfig) {
     this.contractAddress = config.contractAddress;
     this.signer = config.signer;
     this.fhevm = config.fhevm;
 
     // Create contract instance
-    this.contract = FHEJanken__factory.connect(
+    this.contract = FHERockPaperSissors__factory.connect(
       this.contractAddress,
       this.signer
     );
@@ -220,7 +220,7 @@ export class FHEJankenSDK {
   /**
    * Get the contract instance
    *
-   * @returns The FHEJanken contract instance
+   * @returns The FHERockPaperSissors contract instance
    *
    * @example
    * ```typescript
@@ -228,7 +228,7 @@ export class FHEJankenSDK {
    * // Use contract directly for advanced operations
    * ```
    */
-  getContract(): FHEJanken {
+  getContract(): FHERockPaperSissors {
     return this.contract;
   }
 

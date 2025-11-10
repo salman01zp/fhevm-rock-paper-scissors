@@ -1,7 +1,7 @@
-export { FHEJankenSDK } from "./FHEJankenSDK";
+export { FHERockPaperSissorsSDK } from "./fhe-rps";
 
 export type {
-  FHEJankenSDKConfig,
+  FHERockPaperSissorsSDKConfig,
   CreateGameResult,
   SubmitMoveResult,
   GameResult,

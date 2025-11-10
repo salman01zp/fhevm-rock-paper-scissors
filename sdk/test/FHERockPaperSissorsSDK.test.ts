@@ -1,26 +1,26 @@
 /**
- * Simple SDK Tests for FHEJankenSDK
+ * Simple SDK Tests for FHERockPaperSissorsSDK
  *
- * Run from project root with: npx hardhat test sdk/test/FHEJankenSDK.test.ts
+ * Run from project root with: npx hardhat test sdk/test/FHERockPaperSissorsSDK.test.ts
  */
 
 import { expect } from "chai";
 import hre from "hardhat";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import { FHEJanken, FHEJanken__factory } from "../../../types";
-import { FHEJankenSDK, Move, GameMode } from "../src";
+import { FHERockPaperSissors, FHERockPaperSissors__factory } from "../../types";
+import { FHERockPaperSissorsSDK, Move, GameMode } from "../src";
 
 // Access ethers and fhevm from Hardhat Runtime Environment
 // Using any to avoid TypeScript errors with extended Hardhat types
 const ethers = (hre as any).ethers;
 const fhevm = (hre as any).fhevm;
 
-describe("FHEJankenSDK - Simple Tests", function () {
+describe("FHERockPaperSissorsSDK - Simple Tests", function () {
   let contractAddress: string;
   let alice: HardhatEthersSigner;
   let bob: HardhatEthersSigner;
-  let sdkAlice: FHEJankenSDK;
-  let sdkBob: FHEJankenSDK;
+  let sdkAlice: FHERockPaperSissorsSDK;
+  let sdkBob: FHERockPaperSissorsSDK;
 
   before(async function () {
     // Skip tests if not in mock mode
@@ -33,24 +33,24 @@ describe("FHEJankenSDK - Simple Tests", function () {
     alice = signers[0];
     bob = signers[1];
 
-    console.log("\n📦 Deploying FHEJanken contract...");
+    console.log("\n📦 Deploying FHERockPaperSissors contract...");
 
     // Deploy the contract
-    const factory = (await ethers.getContractFactory("FHEJanken")) as FHEJanken__factory;
-    const contract: FHEJanken = await factory.deploy();
+    const factory = (await ethers.getContractFactory("FHERockPaperSissors")) as FHERockPaperSissors__factory;
+    const contract: FHERockPaperSissors = await factory.deploy();
     await contract.waitForDeployment();
     contractAddress = await contract.getAddress();
 
     console.log(`✅ Contract deployed at: ${contractAddress}`);
 
     // Initialize SDK instances for Alice and Bob
-    sdkAlice = new FHEJankenSDK({
+    sdkAlice = new FHERockPaperSissorsSDK({
       contractAddress,
       signer: alice,
       fhevm: fhevm,
     });
 
-    sdkBob = new FHEJankenSDK({
+    sdkBob = new FHERockPaperSissorsSDK({
       contractAddress,
       signer: bob,
       fhevm: fhevm,
@@ -62,8 +62,8 @@ describe("FHEJankenSDK - Simple Tests", function () {
 
   describe("Basic SDK Setup", () => {
     it("should create SDK instances successfully", () => {
-      expect(sdkAlice).to.be.instanceOf(FHEJankenSDK);
-      expect(sdkBob).to.be.instanceOf(FHEJankenSDK);
+      expect(sdkAlice).to.be.instanceOf(FHERockPaperSissorsSDK);
+      expect(sdkBob).to.be.instanceOf(FHERockPaperSissorsSDK);
     });
 
     it("should have access to contract methods", () => {
