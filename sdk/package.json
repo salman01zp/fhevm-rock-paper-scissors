@@ -1,0 +1,62 @@
+{
+  "name": "fhevm-rock-paper-scissors",
+  "version": "1.0.0",
+  "description": "TypeScript SDK for FHE-based Rock-Paper-Scissors game on Ethereum using Zama's FHEVM",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "test": "cd .. && npx hardhat test sdk/test/FHEJankenSDK.test.ts"
+  },
+  "keywords": [
+    "fhevm",
+    "fhe",
+    "fully-homomorphic-encryption",
+    "rock-paper-scissors",
+    "ethereum",
+    "zama",
+    "blockchain",
+    "web3",
+    "sdk",
+    "typescript",
+    "privacy",
+    "encrypted",
+    "janken"
+  ],
+  "author": "salman01zp",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salman01zp/RPS-game.git",
+    "directory": "sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/salman01zp/RPS-game/issues"
+  },
+  "homepage": "https://github.com/salman01zp/RPS-game/tree/main/sdk#readme",
+  "peerDependencies": {
+    "ethers": "^6.15.0"
+  },
+  "dependencies": {
+    "@zama-fhe/relayer-sdk": "^0.2.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.1.0",
+    "@types/node": "^20.19.8",
+    "chai": "^4.5.0",
+    "hardhat": "^2.26.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=7.0.0"
+  }
+}
