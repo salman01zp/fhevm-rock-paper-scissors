@@ -5,9 +5,9 @@ import {FHE, euint8, externalEuint8, ebool} from "@fhevm/solidity/lib/FHE.sol";
 import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 
 /// @title FHE Rock-Paper-Scissors Game
-/// @notice Rock-Paper-Scissors (JankenPon) game using FHE for encrypted moves
+/// @notice Rock-Paper-Scissorsgame using FHE for encrypted moves
 /// @author salman01zp
-contract FHEJanken is SepoliaConfig {
+contract FHERockPaperSissors is SepoliaConfig {
     /// @notice Game state
     struct Game {
         GameMode mode;
@@ -59,9 +59,8 @@ contract FHEJanken is SepoliaConfig {
     event MoveSubmitted(uint256 indexed gameId, address indexed player, euint8 move);
     /// @notice Emitted when game finishes
     /// @param gameId Game ID
-    /// @param result Game result
     /// @param winner Winner address
-    event GameFinished(uint256 indexed gameId, address winner);
+    event GameFinished(uint256 indexed gameId, address indexed winner);
 
     // Errors
     error GameAlreadyFinished();
