@@ -119,7 +119,7 @@ describe("FHEJanken", function () {
 
   });
 
-  it.only("Two player game where is Draw", async function () {
+  it("Two player game where is Draw", async function () {
     // 1. Alice create Game
     const gameId = await janken.connect(alice).createTwoPlayerGame();
     await gameId.wait();

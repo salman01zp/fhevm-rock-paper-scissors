@@ -35,7 +35,6 @@ contract FHEJanken is SepoliaConfig {
         Player2Won
     }
 
-
     // Game move constants:  1 = Rock, 2 = Paper, 3 = Scissors
     uint8 constant ROCK = 1;
     uint8 constant PAPER = 2;
@@ -118,6 +117,8 @@ contract FHEJanken is SepoliaConfig {
 
          // Single-player mode
          if (game.mode == GameMode.SinglePlayer) {
+                // Set CPU address as player 2
+              game.player2 = address(1); 
              require(msg.sender == game.player1, "Not a player in this game");
          } else {
              // For two-player mode, ensure game has two players
