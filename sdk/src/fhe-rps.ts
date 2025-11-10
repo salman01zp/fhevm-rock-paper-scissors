@@ -39,10 +39,7 @@ export class FHERockPaperScissorsSDK {
     this.fhevm = config.fhevm;
 
     // Create contract instance
-    this.contract = FHERockPaperScissors__factory.connect(
-      this.contractAddress,
-      this.signer
-    );
+    this.contract = FHERockPaperScissors__factory.connect(this.contractAddress, this.signer);
   }
 
   /**
@@ -79,7 +76,6 @@ export class FHERockPaperScissorsSDK {
    *
    */
   async joinGame(gameId: bigint): Promise<ContractTransactionReceipt> {
-    
     const tx = await this.contract.joinGame(gameId);
     const receipt = await tx.wait();
 
@@ -98,11 +94,7 @@ export class FHERockPaperScissorsSDK {
    * @throws {Error} If move already submitted or game is finished
    *
    */
-  async submitMove(
-    gameId: bigint,
-    move: Move
-  ): Promise<SubmitMoveResult> {
-  
+  async submitMove(gameId: bigint, move: Move): Promise<SubmitMoveResult> {
     // Get signer address for encryption
     const signerAddress = await this.signer.getAddress();
 
@@ -113,11 +105,7 @@ export class FHERockPaperScissorsSDK {
       .encrypt();
 
     // Submit move
-    const tx = await this.contract.submitMove(
-      gameId,
-      encryptedInput.handles[0],
-      encryptedInput.inputProof
-    );
+    const tx = await this.contract.submitMove(gameId, encryptedInput.handles[0], encryptedInput.inputProof);
 
     const receipt = await tx.wait();
     if (!receipt) {
@@ -139,9 +127,7 @@ export class FHERockPaperScissorsSDK {
    * @throws {Error} If both moves haven't been submitted
    *
    */
-  async checkWinner(
-    gameId: bigint,
-  ): Promise<GameResult> {
+  async checkWinner(gameId: bigint): Promise<GameResult> {
     console.log(`Checking winner for game ${gameId}`);
 
     const tx = await this.contract.checkWinner(gameId);
@@ -166,7 +152,6 @@ export class FHERockPaperScissorsSDK {
    *
    */
   async getGameInfo(gameId: bigint): Promise<GameInfo> {
-
     const game = await this.contract.games(gameId);
 
     const gameInfo: GameInfo = {
@@ -182,15 +167,11 @@ export class FHERockPaperScissorsSDK {
     return gameInfo;
   }
 
-
-
   /**
    * Extract game ID from transaction receipt
    * @private
    */
-  private async extractGameIdFromReceipt(
-    receipt: ContractTransactionReceipt
-  ): Promise<bigint> {
+  private async extractGameIdFromReceipt(receipt: ContractTransactionReceipt): Promise<bigint> {
     for (const log of receipt.logs) {
       try {
         const parsed = this.contract.interface.parseLog({
@@ -221,8 +202,7 @@ export class FHERockPaperScissorsSDK {
     const isDraw = gameInfo.winner === ZERO_ADDRESS;
     const cpuWon = gameInfo.winner === CPU_ADDRESS;
     const player1Won = gameInfo.winner === gameInfo.player1;
-    const player2Won =
-      !isDraw && !cpuWon && gameInfo.winner === gameInfo.player2;
+    const player2Won = !isDraw && !cpuWon && gameInfo.winner === gameInfo.player2;
 
     return {
       isDraw,

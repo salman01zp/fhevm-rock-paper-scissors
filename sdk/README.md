@@ -1,13 +1,14 @@
 # fhevm-rock-paper-scissors
 
-A TypeScript SDK for interacting with the FHE-based (Fully Homomorphic Encryption) Rock-Paper-Scissors smart contract built on Zama's FHEVM.
+A TypeScript SDK for interacting with the FHE-based (Fully Homomorphic Encryption) Rock-Paper-Scissors smart contract
+built on Zama's FHEVM.
 
 ## Quick Start
 
 ```typescript
-import { FHERockPaperScissorsSDK, Move, GameMode } from 'fhevm-rock-paper-scissors';
-import { ethers } from 'ethers';
-import { createInstance } from '@zama-fhe/relayer-sdk/node';
+import { FHERockPaperScissorsSDK, Move, GameMode } from "fhevm-rock-paper-scissors";
+import { ethers } from "ethers";
+import { createInstance } from "@zama-fhe/relayer-sdk/node";
 
 // Setup provider and signer
 const provider = new ethers.JsonRpcProvider("https://sepolia.infura.io/v3/YOUR_KEY");
@@ -16,14 +17,14 @@ const signer = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
 // Create FHEVM instance for encryption
 const fhevm = await createInstance({
   chainId: 11155111, // Sepolia
-  provider
+  provider,
 });
 
 // Initialize SDK
 const sdk = new FHERockPaperScissorsSDK({
   contractAddress: "0x...", // Your deployed contract address
   signer: signer,
-  fhevm: fhevm
+  fhevm: fhevm,
 });
 
 // Create a two-player game
@@ -43,8 +44,6 @@ await sdk2.submitMove(gameId, Move.Scissors);
 const result = await sdk.checkWinner(gameId);
 console.log(result.isDraw ? "It's a draw!" : `Winner: ${result.winner}`);
 ```
-
-
 
 ## Examples
 
@@ -86,8 +85,6 @@ const result = await sdkPlayer1.checkWinner(gameId);
 console.log(`Winner: ${result.winner}`);
 ```
 
-
-
 ## Development
 
 ```bash
@@ -103,4 +100,3 @@ npm run clean
 # Run tests
 npm test
 ```
-

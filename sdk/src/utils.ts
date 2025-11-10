@@ -22,9 +22,7 @@ export function parseMoveString(moveStr: string): Move {
     case "scissors":
       return Move.Scissors;
     default:
-      throw new Error(
-        `Invalid move: ${moveStr}. Use 'rock', 'paper', or 'scissors'`
-      );
+      throw new Error(`Invalid move: ${moveStr}. Use 'rock', 'paper', or 'scissors'`);
   }
 }
 
@@ -114,7 +112,3 @@ export function determineWinner(move1: Move, move2: Move): 0 | 1 | 2 {
   // Otherwise player 2 wins
   return 2;
 }
-
-
-
-

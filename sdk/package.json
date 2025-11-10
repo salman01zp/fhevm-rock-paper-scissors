@@ -1,5 +1,5 @@
 {
-  "name": "fhevm-rock-paper-scissors",
+  "name": "fhevm-rock-paper-scissors-sdk",
   "version": "1.0.0",
   "description": "TypeScript SDK for FHE-based Rock-Paper-Scissors game on Ethereum using Zama's FHEVM",
   "main": "dist/index.js",

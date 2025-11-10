@@ -94,5 +94,4 @@ export interface FHERockPaperScissorsSDKConfig {
   signer: Signer;
   /** FheVM instance for encryption */
   fhevm: FhevmInstance;
-
 }

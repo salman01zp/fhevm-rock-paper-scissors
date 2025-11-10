@@ -3,11 +3,6 @@
  * Reusable helper functions for interacting with FHEJanken contract
  */
 
-import type { HardhatRuntimeEnvironment } from "hardhat/types";
-import type { Signer, ContractTransactionReceipt } from "ethers";
-import type { FHERockPaperScissors } from "../types";
-import { FhevmType } from "@fhevm/hardhat-plugin";
-
 /**
  * Move enum matching contract
  */
@@ -61,7 +56,6 @@ export function parseModeString(modeStr: string): GameMode {
   }
 }
 
-
 /**
  * Parse player name to signer index
  * @param playerName - Player name (alice, bob, or numeric index)
@@ -94,4 +88,3 @@ export function getPlayerName(index: number): string {
   const names = ["Alice", "Bob", "Charlie", "Dave", "Eve"];
   return names[index] || `Player ${index}`;
 }
-

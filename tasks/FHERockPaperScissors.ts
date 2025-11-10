@@ -43,7 +43,6 @@ task("rps:create-game", "Create a new game")
     const contract = await ethers.getContractAt("FHERockPaperScissors", deployment.address);
     const mode = parseModeString(taskArguments.mode);
 
-  
     let tx;
     if (mode === GameMode.TwoPlayer) {
       tx = await contract.connect(signer).createTwoPlayerGame();
@@ -56,17 +55,23 @@ task("rps:create-game", "Create a new game")
     console.log(`Transaction Hash: ${receipt?.hash}`);
 
     // Get game ID from events
-    const event = receipt?.logs.find((log: any) => {
+    const event = receipt?.logs.find((log) => {
       try {
-        const parsed = contract.interface.parseLog(log);
+        const parsed = contract.interface.parseLog({
+          topics: log.topics as string[],
+          data: log.data,
+        });
         return parsed?.name === "GameCreated";
       } catch {
         return false;
       }
     });
-    
+
     if (event) {
-      const parsed = contract.interface.parseLog(event);
+      const parsed = contract.interface.parseLog({
+        topics: event.topics as string[],
+        data: event.data,
+      });
       console.log(`Game ID: ${parsed?.args.gameId}`);
       console.log(`Player1: ${getPlayerName(signerIndex)} (${await signer.getAddress()})`);
     }
@@ -126,14 +131,9 @@ task("rps:submit-move", "Submit an encrypted move")
 
     // Encrypt move
     const signerAddress = await signer.getAddress();
-    const encryptedInput = await fhevm
-      .createEncryptedInput(deployment.address, signerAddress)
-      .add8(move)
-      .encrypt();
+    const encryptedInput = await fhevm.createEncryptedInput(deployment.address, signerAddress).add8(move).encrypt();
 
-    const tx = await contract
-      .connect(signer)
-      .submitMove(gameId, encryptedInput.handles[0], encryptedInput.inputProof);
+    const tx = await contract.connect(signer).submitMove(gameId, encryptedInput.handles[0], encryptedInput.inputProof);
 
     const receipt = await tx.wait();
 
@@ -162,7 +162,7 @@ task("rps:check-winner", "Check game winner")
     console.log(`Checking winner for game ${gameId}...`);
 
     const tx = await contract.connect(signers[0]).checkWinner(gameId);
-    const receipt = await tx.wait();
+    await tx.wait();
     console.log("Waiting for decryption oracle...");
     await fhevm.awaitDecryptionOracle();
 
@@ -172,9 +172,9 @@ task("rps:check-winner", "Check game winner")
     console.log("\n=== Game Result ===");
     if (game.winner === "0x0000000000000000000000000000000000000000") {
       console.log("Result: Draw");
-    } else if(game.winner == "0x0000000000000000000000000000000000000001" ){
+    } else if (game.winner == "0x0000000000000000000000000000000000000001") {
       console.log(`Winner: Computer(${game.winner})`);
-    } else if (game.winner == signers[0].address){
+    } else if (game.winner == signers[0].address) {
       console.log(`Winner: Alice(${game.winner})`);
     } else {
       console.log(`Winner: Bob(${game.winner})`);
@@ -190,8 +190,6 @@ task("rps:game-info", "Get game information")
   .setAction(async function (taskArguments: TaskArguments, hre) {
     const { ethers, deployments } = hre;
 
-    const signers = await ethers.getSigners();
-
     const deployment = taskArguments.address
       ? { address: taskArguments.address }
       : await deployments.get("FHERockPaperScissors");
@@ -204,21 +202,21 @@ task("rps:game-info", "Get game information")
     console.log(`Game ID: ${gameId}`);
     console.log(`Mode: ${Number(game.mode) === 0 ? "Single-Player" : "Two-Player"}`);
     console.log(`Player 1: ${game.player1}`);
-    console.log(`Player 2: ${game.player2 === "0x0000000000000000000000000000000000000000" ? "Waiting..." : game.player2}`);
+    console.log(
+      `Player 2: ${game.player2 === "0x0000000000000000000000000000000000000000" ? "Waiting..." : game.player2}`,
+    );
     console.log(`Finished: ${game.isGamefinished ? "Yes" : "No"}`);
 
     if (game.isGamefinished) {
       console.log("\n=== Game Result ===");
       if (game.winner === "0x0000000000000000000000000000000000000000") {
         console.log("Result: Draw");
-      } else if(game.winner == "0x0000000000000000000000000000000000000001" ){
+      } else if (game.winner == "0x0000000000000000000000000000000000000001") {
         console.log(`Winner: Computer(${game.winner})`);
-      } else if (game.winner == game.player1){
+      } else if (game.winner == game.player1) {
         console.log(`Winner: Player1(${game.winner})`);
       } else {
         console.log(`Winner: Player2(${game.winner})`);
       }
     }
   });
-
-

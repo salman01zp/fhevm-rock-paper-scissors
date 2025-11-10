@@ -9,8 +9,9 @@ import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { FHERockPaperScissors, FHERockPaperScissors__factory } from "../../types";
 import { FHERockPaperScissorsSDK, Move, GameMode } from "../src";
 
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ethers = (hre as any).ethers;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fhevm = (hre as any).fhevm;
 
 describe("FHERockPaperScissorsSDK - Simple Tests", function () {
@@ -56,7 +57,6 @@ describe("FHERockPaperScissorsSDK - Simple Tests", function () {
     console.log(`Bob: ${await bob.getAddress()}\n`);
   });
 
-
   describe("Two-Player Game: Rock vs Scissors", () => {
     let gameId: bigint;
 
@@ -64,14 +64,15 @@ describe("FHERockPaperScissorsSDK - Simple Tests", function () {
       const result = await sdkAlice.createGame(GameMode.TwoPlayer);
 
       expect(result.receipt).to.not.be.undefined;
+      expect(result.gameId).to.be.a("bigint");
 
       gameId = result.gameId;
       console.log(`Game created with ID: ${gameId}`);
     });
 
     it("should allow Bob to join the game", async () => {
-    
-      await sdkBob.joinGame(gameId);
+      const receipt = await sdkBob.joinGame(gameId);
+      expect(receipt).to.not.be.undefined;
 
       const gameInfo = await sdkAlice.getGameInfo(gameId);
       expect(gameInfo.player2).to.equal(await bob.getAddress());
@@ -79,7 +80,8 @@ describe("FHERockPaperScissorsSDK - Simple Tests", function () {
     });
 
     it("should allow Alice to submit move (Rock)", async () => {
-      await sdkAlice.submitMove(gameId, Move.Rock);
+      const result = await sdkAlice.submitMove(gameId, Move.Rock);
+      expect(result.receipt).to.not.be.undefined;
 
       const gameInfo = await sdkAlice.getGameInfo(gameId);
       expect(gameInfo.move1Submitted).to.be.true;
@@ -87,14 +89,17 @@ describe("FHERockPaperScissorsSDK - Simple Tests", function () {
     });
 
     it("should allow Bob to submit move (Scissors)", async () => {
-      await sdkBob.submitMove(gameId, Move.Scissors);
+      const result = await sdkBob.submitMove(gameId, Move.Scissors);
+      expect(result.receipt).to.not.be.undefined;
+
       const gameInfo = await sdkAlice.getGameInfo(gameId);
       expect(gameInfo.move1Submitted).to.be.true;
       expect(gameInfo.move2Submitted).to.be.true;
     });
 
     it("should determine Alice as winner (Rock beats Scissors)", async () => {
-      await sdkAlice.checkWinner(gameId);
+      const result = await sdkAlice.checkWinner(gameId);
+      expect(result).to.not.be.undefined;
 
       // Wait for decryption oracle in mock mode
       await fhevm.awaitDecryptionOracle();
@@ -108,7 +113,6 @@ describe("FHERockPaperScissorsSDK - Simple Tests", function () {
     });
   });
 
-  
   describe("Single-Player Game: Player vs CPU", () => {
     let gameId: bigint;
 
@@ -124,7 +128,8 @@ describe("FHERockPaperScissorsSDK - Simple Tests", function () {
 
     it("should auto-generate CPU move after player submits", async () => {
       console.log("Alice plays Paper...");
-      await sdkAlice.submitMove(gameId, Move.Paper);
+      const result = await sdkAlice.submitMove(gameId, Move.Paper);
+      expect(result.receipt).to.not.be.undefined;
 
       const gameInfo = await sdkAlice.getGameInfo(gameId);
       expect(gameInfo.move1Submitted).to.be.true;
@@ -132,13 +137,14 @@ describe("FHERockPaperScissorsSDK - Simple Tests", function () {
     });
 
     it("should determine winner for single-player game", async () => {
-      await sdkAlice.checkWinner(gameId);
+      const result = await sdkAlice.checkWinner(gameId);
+      expect(result).to.not.be.undefined;
       await fhevm.awaitDecryptionOracle();
 
       const gameInfo = await sdkAlice.getGameInfo(gameId);
       expect(gameInfo.isGameFinished).to.be.true;
 
-      if (gameInfo.winner === await alice.getAddress()) {
+      if (gameInfo.winner === (await alice.getAddress())) {
         console.log("Alice won!");
       } else if (gameInfo.winner === "0x0000000000000000000000000000000000000001") {
         console.log("CPU won!");
@@ -147,8 +153,4 @@ describe("FHERockPaperScissorsSDK - Simple Tests", function () {
       }
     });
   });
-
-
-
-  
 });

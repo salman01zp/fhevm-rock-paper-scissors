@@ -248,7 +248,7 @@ contract FHERockPaperScissors is SepoliaConfig {
         Game storage game = games[_gameId];
 
         if (_clearIsGameDraw) {
-            emit GameFinished(_gameId, address(0));   // Game draw, no winner
+            emit GameFinished(_gameId, address(0)); // Game draw, no winner
         } else if (_clearPlayer1Won) {
             game.winner = game.player1;
             emit GameFinished(_gameId, game.player1); // Player1 Won

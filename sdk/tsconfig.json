@@ -45,14 +45,6 @@
       "../../types/*": ["../types/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "index.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "test",
-    "**/*.test.ts"
-  ]
+  "include": ["src/**/*", "index.ts"],
+  "exclude": ["node_modules", "dist", "test", "**/*.test.ts"]
 }
