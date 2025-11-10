@@ -6,7 +6,7 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 
 /// @title FHE Rock-Paper-Scissors Game
 /// @notice Rock-Paper-Scissors game using FHE for encrypted moves
-/// @author Zama Team
+/// @author salman01zp
 contract FHEJanken is SepoliaConfig {
     /// @notice Game state
     struct Game {
