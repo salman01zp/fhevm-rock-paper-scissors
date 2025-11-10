@@ -97,7 +97,7 @@ describe("FHEJanken", function () {
     const jankenAddress = await janken.getAddress();
     // 3. Submit encrypted moves
     // Alice plays Scissors (3), Bob plays Paper (2) -> Alice should win
-    const aliceMove = await fhevm.createEncryptedInput(jankenAddress, alice.address).add8(1).encrypt();
+    const aliceMove = await fhevm.createEncryptedInput(jankenAddress, alice.address).add8(3).encrypt();
     await janken.connect(alice).submitMove(id, aliceMove.handles[0], aliceMove.inputProof);
 
     const bobMove = await fhevm.createEncryptedInput(jankenAddress, bob.address).add8(2).encrypt();
