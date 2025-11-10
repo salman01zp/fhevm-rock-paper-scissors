@@ -214,9 +214,7 @@ contract FHEJanken is SepoliaConfig {
         cypherTexts[1] = FHE.toBytes32(game.encryptedPlayer1Won);
         
         uint256 requestId = FHE.requestDecryption(
-            // the list of encrypted values we want to publc decrypt
             cypherTexts,
-            // the function selector the FHEVM backend will callback with the clear values as arguments
             this.callbackWinnerDetermination.selector
         );
 
