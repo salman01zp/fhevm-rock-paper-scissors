@@ -56,11 +56,11 @@ contract FHEJanken is SepoliaConfig {
     event GameFinished(uint256 indexed gameId, GameResult result, address winner);
 
 
-    function createTwoPlayerGame(GameMode mode) external returns (uint256) {
+    function createTwoPlayerGame() external returns (uint256) {
         gameId++;
         uint256 newGameId = gameId;
         games[newGameId] = Game({
-            mode: mode,
+            mode: GameMode.TwoPlayer,
             player1: msg.sender,
             player2: address(0),
             encryptedMove1: FHE.asEuint8(0),
@@ -78,11 +78,11 @@ contract FHEJanken is SepoliaConfig {
         return newGameId;
     }
 
-    function createSinglePlayerGame(GameMode mode) external returns (uint256) {
+    function createSinglePlayerGame() external returns (uint256) {
         gameId++;
         uint256 newGameId = gameId;
         games[newGameId] = Game({
-            mode: mode,
+            mode: GameMode.SinglePlayer ,
             player1: msg.sender,
             player2: address(0),
             encryptedMove1: FHE.asEuint8(0),
@@ -118,7 +118,7 @@ contract FHEJanken is SepoliaConfig {
 
          // Single-player mode
          if (game.mode == GameMode.SinglePlayer) {
-             require(msg.sender == game.player1, "Only player1 can submit move in single-player mode");
+             require(msg.sender == game.player1, "Not a player in this game");
          } else {
              // For two-player mode, ensure game has two players
              require(game.player2 != address(0), "Waiting for second player to join");
