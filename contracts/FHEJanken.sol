@@ -6,7 +6,6 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 import "hardhat/console.sol";
 
 contract FHEJanken is SepoliaConfig {
-
     // Game
     struct Game {
         GameMode mode;
@@ -19,7 +18,7 @@ contract FHEJanken is SepoliaConfig {
         bool move1Submitted;
         bool move2Submitted;
         bool isGamefinished;
-        address winner;        
+        address winner;
     }
 
     // Game mode
@@ -29,7 +28,7 @@ contract FHEJanken is SepoliaConfig {
     }
 
     // GameResult
-    enum GameResult{
+    enum GameResult {
         Draw,
         Player1Won,
         Player2Won
@@ -43,17 +42,15 @@ contract FHEJanken is SepoliaConfig {
     // Storage
     uint256 public gameId;
     mapping(uint256 => Game) public games;
-    
+
     // Decryption request tracking
     mapping(uint256 => uint256) public decryptionRequestToGame; // requestId => gameId
-
 
     // Events
     event GameCreated(uint256 indexed gameId, address indexed player1, GameMode mode);
     event PlayerJoined(uint256 gameId, address indexed player2);
     event MoveSubmitted(uint256 indexed gameId, address indexed player, euint8 move);
     event GameFinished(uint256 indexed gameId, GameResult result, address winner);
-
 
     function createTwoPlayerGame() external returns (uint256) {
         gameId++;
@@ -65,13 +62,11 @@ contract FHEJanken is SepoliaConfig {
             encryptedMove1: FHE.asEuint8(0),
             encryptedMove2: FHE.asEuint8(0),
             encryptedPlayer1Won: FHE.asEbool(false),
-            isGameDraw:FHE.asEbool(false),
+            isGameDraw: FHE.asEbool(false),
             move1Submitted: false,
             move2Submitted: false,
             isGamefinished: false,
             winner: address(0)
-            
-            
         });
         emit GameCreated(newGameId, msg.sender, GameMode.TwoPlayer);
         return newGameId;
@@ -81,7 +76,7 @@ contract FHEJanken is SepoliaConfig {
         gameId++;
         uint256 newGameId = gameId;
         games[newGameId] = Game({
-            mode: GameMode.SinglePlayer ,
+            mode: GameMode.SinglePlayer,
             player1: msg.sender,
             player2: address(0),
             encryptedMove1: FHE.asEuint8(0),
@@ -92,8 +87,6 @@ contract FHEJanken is SepoliaConfig {
             move2Submitted: false,
             isGamefinished: false,
             winner: address(0)
-            
-            
         });
         emit GameCreated(newGameId, msg.sender, GameMode.SinglePlayer);
         return newGameId;
@@ -111,23 +104,20 @@ contract FHEJanken is SepoliaConfig {
     }
 
     function submitMove(uint256 _gameId, externalEuint8 encryptedMove1, bytes calldata inputProof) external {
-         Game storage game = games[_gameId];
+        Game storage game = games[_gameId];
 
-         require(!game.isGamefinished, "Game already finished");
+        require(!game.isGamefinished, "Game already finished");
 
-         // Single-player mode
-         if (game.mode == GameMode.SinglePlayer) {
-                // Set CPU address as player 2
-              game.player2 = address(1); 
-             require(msg.sender == game.player1, "Not a player in this game");
-         } else {
-             // For two-player mode, ensure game has two players
-             require(game.player2 != address(0), "Waiting for second player to join");
-             require(
-                msg.sender == game.player1 || msg.sender == game.player2,
-                "Not a player in this game"
-            );
-         }
+        // Single-player mode
+        if (game.mode == GameMode.SinglePlayer) {
+            // Set CPU address as player 2
+            game.player2 = address(1);
+            require(msg.sender == game.player1, "Not a player in this game");
+        } else {
+            // For two-player mode, ensure game has two players
+            require(game.player2 != address(0), "Waiting for second player to join");
+            require(msg.sender == game.player1 || msg.sender == game.player2, "Not a player in this game");
+        }
 
         euint8 move = FHE.fromExternal(encryptedMove1, inputProof);
 
@@ -152,7 +142,6 @@ contract FHEJanken is SepoliaConfig {
         if (game.move1Submitted && game.move2Submitted) {
             _determineWinner(_gameId);
         }
-
     }
 
     function _generateMove(uint256 _gameId) private {
@@ -177,52 +166,34 @@ contract FHEJanken is SepoliaConfig {
 
         ebool isDraw = FHE.eq(move1, move2);
 
-        ebool rockBeatsScissors = FHE.and(
-            FHE.eq(move1, FHE.asEuint8(ROCK)),
-            FHE.eq(move2, FHE.asEuint8(SCISSORS))
-        );
+        ebool rockBeatsScissors = FHE.and(FHE.eq(move1, FHE.asEuint8(ROCK)), FHE.eq(move2, FHE.asEuint8(SCISSORS)));
 
-        ebool paperBeatsRock = FHE.and(
-            FHE.eq(move1, FHE.asEuint8(PAPER)),
-            FHE.eq(move2, FHE.asEuint8(ROCK))
-        );
+        ebool paperBeatsRock = FHE.and(FHE.eq(move1, FHE.asEuint8(PAPER)), FHE.eq(move2, FHE.asEuint8(ROCK)));
 
-        ebool scissorsBeatsPaper = FHE.and(
-            FHE.eq(move1, FHE.asEuint8(SCISSORS)),
-            FHE.eq(move2, FHE.asEuint8(PAPER))
-        );
+        ebool scissorsBeatsPaper = FHE.and(FHE.eq(move1, FHE.asEuint8(SCISSORS)), FHE.eq(move2, FHE.asEuint8(PAPER)));
 
-        ebool player1Wins = FHE.or(
-            FHE.or(rockBeatsScissors, paperBeatsRock),
-            scissorsBeatsPaper
-        );
+        ebool player1Wins = FHE.or(FHE.or(rockBeatsScissors, paperBeatsRock), scissorsBeatsPaper);
         game.encryptedPlayer1Won = player1Wins;
         game.isGameDraw = isDraw;
         FHE.allowThis(game.encryptedPlayer1Won);
         FHE.allowThis(game.isGameDraw);
         FHE.makePubliclyDecryptable(game.encryptedPlayer1Won);
-
     }
 
     function checkWinner(uint256 _gameId) external {
         Game storage game = games[_gameId];
-        
+
         require(!game.isGamefinished, "Game already finished");
 
         bytes32[] memory cypherTexts = new bytes32[](2);
         cypherTexts[0] = FHE.toBytes32(game.isGameDraw);
         cypherTexts[1] = FHE.toBytes32(game.encryptedPlayer1Won);
-        
-        uint256 requestId = FHE.requestDecryption(
-            cypherTexts,
-            this.callbackWinnerDetermination.selector
-        );
+
+        uint256 requestId = FHE.requestDecryption(cypherTexts, this.callbackWinnerDetermination.selector);
 
         // Store the mapping from requestId to gameId
         decryptionRequestToGame[requestId] = _gameId;
     }
-
-
 
     function callbackWinnerDetermination(
         uint256 requestId,
@@ -237,18 +208,15 @@ contract FHEJanken is SepoliaConfig {
         Game storage game = games[_gameId];
 
         if (_clearIsGameDraw) {
-            emit GameFinished(_gameId, GameResult.Draw, address(0));           // No winner
+            emit GameFinished(_gameId, GameResult.Draw, address(0)); // No winner
         } else if (_clearPlayer1Won) {
             game.winner = game.player1;
-            emit GameFinished(_gameId, GameResult.Player1Won, game.player1);   // Player1 Won
-            
+            emit GameFinished(_gameId, GameResult.Player1Won, game.player1); // Player1 Won
         } else {
             game.winner = game.player2;
-            emit GameFinished(_gameId, GameResult.Player2Won, game.player2);   // Player2 Won
+            emit GameFinished(_gameId, GameResult.Player2Won, game.player2); // Player2 Won
         }
         game.isGamefinished = true;
         delete decryptionRequestToGame[requestId];
-
     }
-
 }

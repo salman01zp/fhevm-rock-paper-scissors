@@ -27,7 +27,7 @@ describe("FHEJanken", function () {
     // 1. Alice create Game
     const gameId = await janken.connect(alice).createTwoPlayerGame();
     await gameId.wait();
-    
+
     const id = await janken.gameId();
 
     // 2. Player2 Bob joins the game
@@ -52,14 +52,13 @@ describe("FHEJanken", function () {
     game = await janken.games(id);
     expect(game.isGamefinished).to.eq(true);
     expect(game.winner).to.eq(alice.address);
-
   });
 
   it("Two player game where Paper beats Rock", async function () {
     // 1. Alice create Game
     const gameId = await janken.connect(alice).createTwoPlayerGame();
     await gameId.wait();
-    
+
     const id = await janken.gameId();
 
     // 2. Player2 Bob joins the game
@@ -84,14 +83,13 @@ describe("FHEJanken", function () {
     game = await janken.games(id);
     expect(game.isGamefinished).to.eq(true);
     expect(game.winner).to.eq(bob.address);
-
   });
 
   it("Two player game where Sissors beats Paper", async function () {
     // 1. Alice create Game
     const gameId = await janken.connect(alice).createTwoPlayerGame();
     await gameId.wait();
-    
+
     const id = await janken.gameId();
 
     // 2. Player2 Bob joins the game
@@ -116,14 +114,13 @@ describe("FHEJanken", function () {
     game = await janken.games(id);
     expect(game.isGamefinished).to.eq(true);
     expect(game.winner).to.eq(alice.address);
-
   });
 
   it("Two player game where is Draw", async function () {
     // 1. Alice create Game
     const gameId = await janken.connect(alice).createTwoPlayerGame();
     await gameId.wait();
-    
+
     const id = await janken.gameId();
 
     // 2. Player2 Bob joins the game
@@ -147,23 +144,20 @@ describe("FHEJanken", function () {
     let game = await janken.games(id);
     game = await janken.games(id);
     expect(game.isGamefinished).to.eq(true);
-    expect(game.winner).to.eq('0x0000000000000000000000000000000000000000');
-
+    expect(game.winner).to.eq("0x0000000000000000000000000000000000000000");
   });
-
 
   it("Single player game Player vs CPU", async function () {
     // 1. Alice create Game
     const gameId = await janken.connect(alice).createSinglePlayerGame();
     await gameId.wait();
-    
+
     const id = await janken.gameId();
     const jankenAddress = await janken.getAddress();
 
-    // 3. Alice player Rock and submits encrypted move 
+    // 3. Alice player Rock and submits encrypted move
     const aliceMove = await fhevm.createEncryptedInput(jankenAddress, alice.address).add8(1).encrypt();
     await janken.connect(alice).submitMove(id, aliceMove.handles[0], aliceMove.inputProof);
-
 
     // 4. Check winner
     const checkWinnerTx = await janken.checkWinner(id);
@@ -173,9 +167,6 @@ describe("FHEJanken", function () {
     let game = await janken.games(id);
     game = await janken.games(id);
     expect(game.isGamefinished).to.eq(true);
-    console.log("Game winner : ", game.winner)
-
+    console.log("Game winner : ", game.winner);
   });
-
-  
 });
