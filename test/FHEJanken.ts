@@ -2,7 +2,6 @@ import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { ethers, fhevm } from "hardhat";
 import { FHEJanken, FHEJanken__factory } from "../types";
 import { expect } from "chai";
-import { HardhatFhevmRuntimeEnvironment } from "@fhevm/hardhat-plugin";
 
 describe("FHEJanken", function () {
   let janken: FHEJanken;

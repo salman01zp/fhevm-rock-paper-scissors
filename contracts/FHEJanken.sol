@@ -3,10 +3,12 @@ pragma solidity ^0.8.24;
 
 import {FHE, euint8, externalEuint8, ebool} from "@fhevm/solidity/lib/FHE.sol";
 import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
-import "hardhat/console.sol";
 
+/// @title FHE Rock-Paper-Scissors Game
+/// @notice Rock-Paper-Scissors game using FHE for encrypted moves
+/// @author Zama Team
 contract FHEJanken is SepoliaConfig {
-    // Game
+    /// @notice Game state
     struct Game {
         GameMode mode;
         address player1;
@@ -21,39 +23,65 @@ contract FHEJanken is SepoliaConfig {
         address winner;
     }
 
-    // Game mode
+    /// @notice Game mode types
     enum GameMode {
         SinglePlayer,
         TwoPlayer
     }
 
-    // GameResult
+    /// @notice Game result types
     enum GameResult {
         Draw,
         Player1Won,
         Player2Won
     }
 
-    // Game move constants:  1 = Rock, 2 = Paper, 3 = Scissors
-    uint8 constant ROCK = 1;
-    uint8 constant PAPER = 2;
-    uint8 constant SCISSORS = 3;
+    // Constants
+    uint8 internal constant ROCK = 1;
+    uint8 internal constant PAPER = 2;
+    uint8 internal constant SCISSORS = 3;
 
     // Storage
+    /// @notice Current game ID counter
     uint256 public gameId;
-    mapping(uint256 => Game) public games;
-
-    // Decryption request tracking
-    mapping(uint256 => uint256) public decryptionRequestToGame; // requestId => gameId
+    /// @notice Game data by ID
+    mapping(uint256 gameId => Game game) public games;
+    /// @notice Maps decryption request to game ID
+    mapping(uint256 requestId => uint256 gameId) public decryptionRequestToGame;
 
     // Events
+    /// @notice Emitted when a game is created
+    /// @param gameId Game ID
+    /// @param player1 Creator address
+    /// @param mode Game mode
     event GameCreated(uint256 indexed gameId, address indexed player1, GameMode mode);
-    event PlayerJoined(uint256 gameId, address indexed player2);
+    /// @notice Emitted when player joins
+    /// @param gameId Game ID
+    /// @param player2 Joiner address
+    event PlayerJoined(uint256 indexed gameId, address indexed player2);
+    /// @notice Emitted when move is submitted
+    /// @param gameId Game ID
+    /// @param player Player address
+    /// @param move Encrypted move
     event MoveSubmitted(uint256 indexed gameId, address indexed player, euint8 move);
+    /// @notice Emitted when game finishes
+    /// @param gameId Game ID
+    /// @param result Game result
+    /// @param winner Winner address
     event GameFinished(uint256 indexed gameId, GameResult result, address winner);
 
+    // Errors
+    error GameAlreadyFinished();
+    error CannotJoinOwnGame();
+    error CannotJoinSinglePlayerGame();
+    error NotAPlayer();
+    error WaitingForPlayer2();
+    error MoveAlreadySubmitted();
+
+    /// @notice Create a two-player game
+    /// @return Game ID
     function createTwoPlayerGame() external returns (uint256) {
-        gameId++;
+        ++gameId;
         uint256 newGameId = gameId;
         games[newGameId] = Game({
             mode: GameMode.TwoPlayer,
@@ -72,8 +100,10 @@ contract FHEJanken is SepoliaConfig {
         return newGameId;
     }
 
+    /// @notice Create a single-player game against CPU
+    /// @return Game ID
     function createSinglePlayerGame() external returns (uint256) {
-        gameId++;
+        ++gameId;
         uint256 newGameId = gameId;
         games[newGameId] = Game({
             mode: GameMode.SinglePlayer,
@@ -92,58 +122,75 @@ contract FHEJanken is SepoliaConfig {
         return newGameId;
     }
 
+    /// @notice Join an existing two-player game
+    /// @param _gameId Game ID to join
     function joinGame(uint256 _gameId) external {
         Game storage game = games[_gameId];
 
-        require(!game.isGamefinished, "Game already finished");
-        require(msg.sender != game.player1, "Cannot join your own game");
-        require(game.mode == GameMode.TwoPlayer, "Cannot join single-player game");
+        if (game.isGamefinished) revert GameAlreadyFinished();
+        if (msg.sender == game.player1) revert CannotJoinOwnGame();
+        if (game.mode != GameMode.TwoPlayer) revert CannotJoinSinglePlayerGame();
 
         game.player2 = msg.sender;
         emit PlayerJoined(_gameId, msg.sender);
     }
 
+    /// @notice Submit an encrypted move
+    /// @param _gameId Game ID
+    /// @param encryptedMove1 Encrypted move (1=Rock, 2=Paper, 3=Scissors)
+    /// @param inputProof Proof for encrypted input
     function submitMove(uint256 _gameId, externalEuint8 encryptedMove1, bytes calldata inputProof) external {
         Game storage game = games[_gameId];
+        if (game.isGamefinished) revert GameAlreadyFinished();
 
-        require(!game.isGamefinished, "Game already finished");
-
-        // Single-player mode
-        if (game.mode == GameMode.SinglePlayer) {
-            // Set CPU address as player 2
-            game.player2 = address(1);
-            require(msg.sender == game.player1, "Not a player in this game");
-        } else {
-            // For two-player mode, ensure game has two players
-            require(game.player2 != address(0), "Waiting for second player to join");
-            require(msg.sender == game.player1 || msg.sender == game.player2, "Not a player in this game");
-        }
-
+        _validatePlayer(game);
         euint8 move = FHE.fromExternal(encryptedMove1, inputProof);
+        _recordMove(game, _gameId, move);
 
-        if (msg.sender == game.player1) {
-            require(!game.move1Submitted, "Move already submitted");
-            game.encryptedMove1 = move;
-            game.move1Submitted = true;
-            FHE.allowThis(game.encryptedMove1);
-            emit MoveSubmitted(_gameId, msg.sender, move);
-        } else {
-            require(!game.move2Submitted, "Move already submitted");
-            game.encryptedMove2 = move;
-            game.move2Submitted = true;
-            FHE.allowThis(game.encryptedMove2);
-            emit MoveSubmitted(_gameId, msg.sender, move);
-        }
-
-        // If single-player mode generate second player random move
+        // Auto-generate CPU move for single-player
         if (game.mode == GameMode.SinglePlayer && !game.move2Submitted) {
             _generateMove(_gameId);
         }
+
+        // Determine winner if both moves submitted
         if (game.move1Submitted && game.move2Submitted) {
             _determineWinner(_gameId);
         }
     }
 
+    /// @notice Validate player eligibility
+    /// @param game Game reference
+    function _validatePlayer(Game storage game) private {
+        if (game.mode == GameMode.SinglePlayer) {
+            game.player2 = address(1);
+            if (msg.sender != game.player1) revert NotAPlayer();
+        } else {
+            if (game.player2 == address(0)) revert WaitingForPlayer2();
+            if (msg.sender != game.player1 && msg.sender != game.player2) revert NotAPlayer();
+        }
+    }
+
+    /// @notice Record player move
+    /// @param game Game reference
+    /// @param _gameId Game ID
+    /// @param move Encrypted move
+    function _recordMove(Game storage game, uint256 _gameId, euint8 move) private {
+        if (msg.sender == game.player1) {
+            if (game.move1Submitted) revert MoveAlreadySubmitted();
+            game.encryptedMove1 = move;
+            game.move1Submitted = true;
+            FHE.allowThis(game.encryptedMove1);
+        } else {
+            if (game.move2Submitted) revert MoveAlreadySubmitted();
+            game.encryptedMove2 = move;
+            game.move2Submitted = true;
+            FHE.allowThis(game.encryptedMove2);
+        }
+        emit MoveSubmitted(_gameId, msg.sender, move);
+    }
+
+    /// @notice Generate random CPU move
+    /// @param _gameId Game ID
     function _generateMove(uint256 _gameId) private {
         Game storage game = games[_gameId];
         euint8 randomValue = FHE.randEuint8();
@@ -158,32 +205,30 @@ contract FHEJanken is SepoliaConfig {
         emit MoveSubmitted(_gameId, address(this), move);
     }
 
+    /// @notice Determine winner from moves
+    /// @param _gameId Game ID
     function _determineWinner(uint256 _gameId) private {
         Game storage game = games[_gameId];
-
         euint8 move1 = game.encryptedMove1;
         euint8 move2 = game.encryptedMove2;
 
-        ebool isDraw = FHE.eq(move1, move2);
+        game.isGameDraw = FHE.eq(move1, move2);
 
         ebool rockBeatsScissors = FHE.and(FHE.eq(move1, FHE.asEuint8(ROCK)), FHE.eq(move2, FHE.asEuint8(SCISSORS)));
-
         ebool paperBeatsRock = FHE.and(FHE.eq(move1, FHE.asEuint8(PAPER)), FHE.eq(move2, FHE.asEuint8(ROCK)));
-
         ebool scissorsBeatsPaper = FHE.and(FHE.eq(move1, FHE.asEuint8(SCISSORS)), FHE.eq(move2, FHE.asEuint8(PAPER)));
 
-        ebool player1Wins = FHE.or(FHE.or(rockBeatsScissors, paperBeatsRock), scissorsBeatsPaper);
-        game.encryptedPlayer1Won = player1Wins;
-        game.isGameDraw = isDraw;
+        game.encryptedPlayer1Won = FHE.or(FHE.or(rockBeatsScissors, paperBeatsRock), scissorsBeatsPaper);
         FHE.allowThis(game.encryptedPlayer1Won);
         FHE.allowThis(game.isGameDraw);
         FHE.makePubliclyDecryptable(game.encryptedPlayer1Won);
     }
 
+    /// @notice Request to decrypt and determine winner
+    /// @param _gameId Game ID
     function checkWinner(uint256 _gameId) external {
         Game storage game = games[_gameId];
-
-        require(!game.isGamefinished, "Game already finished");
+        if (game.isGamefinished) revert GameAlreadyFinished();
 
         bytes32[] memory cypherTexts = new bytes32[](2);
         cypherTexts[0] = FHE.toBytes32(game.isGameDraw);
@@ -195,10 +240,14 @@ contract FHEJanken is SepoliaConfig {
         decryptionRequestToGame[requestId] = _gameId;
     }
 
+    /// @notice Callback to decrypt winner info
+    /// @param requestId Decryption request ID
+    /// @param cleartexts Decrypted values
+    /// @param decryptionProof Proof of decryption
     function callbackWinnerDetermination(
         uint256 requestId,
-        bytes memory cleartexts,
-        bytes memory decryptionProof
+        bytes calldata cleartexts,
+        bytes calldata decryptionProof
     ) external {
         // Verify the decryption proof
         FHE.checkSignatures(requestId, cleartexts, decryptionProof);
